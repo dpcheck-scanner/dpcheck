@@ -47,3 +47,4 @@ core/src/test/resources/nodejs/**/.gitattributes
 core/src/test/resources/nodejs/**/*.cmd
 core/src/test/resources/nodejs/**/*.jshintrc
 core/src/test/resources/nodejs/**/.travis.yml
+core/src/test/resources/nodeaudit_lockfile2/node_modules/

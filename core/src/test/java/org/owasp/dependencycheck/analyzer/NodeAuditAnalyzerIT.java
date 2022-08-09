@@ -13,6 +13,9 @@ import org.owasp.dependencycheck.exception.InitializationException;
 import org.owasp.dependencycheck.utils.InvalidSettingException;
 import org.owasp.dependencycheck.utils.Settings;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public class NodeAuditAnalyzerIT extends BaseTest {
 
     @Test
@@ -37,6 +40,25 @@ public class NodeAuditAnalyzerIT extends BaseTest {
                 }
             }
             assertTrue("Uglify was not found", found);
+        }
+    }
+
+    @Test
+    public void testAnalyzePackageWithLockfileVersion2() throws AnalysisException, InitializationException, InvalidSettingException {
+        Assume.assumeThat(getSettings().getBoolean(Settings.KEYS.ANALYZER_NODE_AUDIT_ENABLED), is(true));
+        try (Engine engine = new Engine(getSettings())) {
+            NodeAuditAnalyzer analyzer = new NodeAuditAnalyzer();
+            analyzer.setFilesMatched(true);
+            analyzer.initialize(getSettings());
+            analyzer.prepare(engine);
+            final Dependency toScan = new Dependency(BaseTest.getResourceAsFile(this, "nodeaudit_lockfile2/package-lock.json"));
+            analyzer.analyze(toScan, engine);
+            assertTrue("At least 1 dependency should be identified", 0 < engine.getDependencies().length);
+
+            Optional<Dependency> terser = Arrays.stream(engine.getDependencies())
+                    .filter(dependency -> "package-lock.json?terser".equals(dependency.getFileName()))
+                    .findFirst();
+            assertTrue("Terser must be identified as vulnerable", terser.isPresent());
         }
     }
 

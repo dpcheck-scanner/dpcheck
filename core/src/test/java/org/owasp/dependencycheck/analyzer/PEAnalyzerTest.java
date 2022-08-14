@@ -22,7 +22,6 @@ import org.junit.After;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.owasp.dependencycheck.BaseTest;
@@ -32,8 +31,6 @@ import org.owasp.dependencycheck.dependency.Confidence;
 import org.owasp.dependencycheck.dependency.Dependency;
 import org.owasp.dependencycheck.dependency.Evidence;
 import org.owasp.dependencycheck.dependency.EvidenceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests for the PEAnalyzer.
@@ -42,10 +39,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PEAnalyzerTest extends BaseTest {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PEAnalyzerTest.class);
-
-    private static final String LOG_KEY = "org.slf4j.simpleLogger.org.owasp.dependencycheck.analyzer.PEAnalyzer";
 
     private PEAnalyzer analyzer;
 
@@ -83,6 +76,19 @@ public class PEAnalyzerTest extends BaseTest {
         assertTrue(d.contains(EvidenceType.VENDOR, new Evidence("PE Header", "CompanyName", "The Apache Software Foundation", Confidence.HIGHEST)));
         assertTrue(d.contains(EvidenceType.PRODUCT, new Evidence("PE Header", "ProductName", "log4net", Confidence.HIGHEST)));
         assertEquals("log4net", d.getName());
+    }
+
+    @Test
+    public void testExeAnalysis() throws AnalysisException {
+        // Given
+        File file = BaseTest.getResourceAsFile(this, "wildfly-service.exe");
+
+        Dependency dependency = new Dependency(file);
+
+        // When
+        analyzer.analyze(dependency, null);
+
+        // Then
     }
 
     @After
